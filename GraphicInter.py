@@ -96,53 +96,53 @@ class GraphicInter(tk.Tk):
     def refresh(self):
         """Rafraichissement de l'écran"""
         # Récupération des données de l'application client
-        sTcpRead = self.TcpClientCom.outStream.read()
-        if sTcpRead != '':
-            listSplitedTcpInfo = sTcpRead.split('|')
-            if len(listSplitedTcpInfo) == 3:
-                self.Canvas.itemconfigure(self._LocalTeam, text=listSplitedTcpInfo[0])
-                self.Canvas.itemconfigure(self._VisitorTeam, text=listSplitedTcpInfo[1])
-                self.TM = listSplitedTcpInfo[2]
-                if self.TM == "TM":
-                    self.Canvas.itemconfigure(self._fieldPeriod, text='T M')
+        with self.TcpClientCom.outLocker:
+            if self.TcpClientCom.outStream != '':
+                listSplitedTcpInfo = self.TcpClientCom.outStream.split('|')
+                if len(listSplitedTcpInfo) == 3:
+                    self.Canvas.itemconfigure(self._LocalTeam, text=listSplitedTcpInfo[0])
+                    self.Canvas.itemconfigure(self._VisitorTeam, text=listSplitedTcpInfo[1])
+                    self.TM = listSplitedTcpInfo[2]
+                    if self.TM == "TM":
+                        self.Canvas.itemconfigure(self._fieldPeriod, text='T M')
         
         # Récupération des données de l'afficheur
-        sPanelRead = self.PanelInfo.outStream.read()
-        if sPanelRead != '':
-            listSplitedPanelInfo = sPanelRead.split('|')
-            # Mise en forme de l'affichage de la mi-temps ou d'un temps mort
-            if self.TM != "TM":
-                if listSplitedPanelInfo[3] == '1':
-                    listSplitedPanelInfo[3] += 'ère'
+        with self.PanelInfo.outLocker:
+            if self.PanelInfo.outStream != '':
+                listSplitedPanelInfo = self.PanelInfo.outStream.split('|')
+                # Mise en forme de l'affichage de la mi-temps ou d'un temps mort
+                if self.TM != "TM":
+                    if listSplitedPanelInfo[3] == '1':
+                        listSplitedPanelInfo[3] += 'ère'
+                    else:
+                        listSplitedPanelInfo[3] += 'ème'
                 else:
-                    listSplitedPanelInfo[3] += 'ème'
-            else:
-                listSplitedPanelInfo[3] = 'T M'
-            self.Canvas.itemconfigure(self._fieldTime, text=listSplitedPanelInfo[0])
-            self.Canvas.itemconfigure(self._fieldLocalScore, text=listSplitedPanelInfo[1])
-            # Pour éviter que les champs d'affichage de score se superposent avec les champs chronomètre et mi-temps, diminution de la police de caractère si un des scores dépasse la centaine
-            if len(listSplitedPanelInfo[1]) > 2 or len(listSplitedPanelInfo[2]) > 2:
-                self.Canvas.itemconfigure(self._fieldLocalScore, font=("Arial", 10, 'bold'))
-                self.Canvas.itemconfigure(self._fieldVisitorScore, font=("Arial", 10, 'bold'))
-            else:
-                self.Canvas.itemconfigure(self._fieldLocalScore, font=("Arial", 13, 'bold'))
-                self.Canvas.itemconfigure(self._fieldVisitorScore, font=("Arial", 13, 'bold'))
-            self.Canvas.itemconfigure(self._fieldVisitorScore, text=listSplitedPanelInfo[2])
-            self.Canvas.itemconfigure(self._fieldPeriod, text=listSplitedPanelInfo[3])
-            for index, item in enumerate(self._fieldLocalPrison):
-                if listSplitedPanelInfo[5 + index] == ':':
-                    self.Canvas.itemconfigure(item, state='hidden')
-                    self.Canvas.itemconfigure(self._pictLocalPrison[index], state='hidden')
+                    listSplitedPanelInfo[3] = 'T M'
+                self.Canvas.itemconfigure(self._fieldTime, text=listSplitedPanelInfo[0])
+                self.Canvas.itemconfigure(self._fieldLocalScore, text=listSplitedPanelInfo[1])
+                # Pour éviter que les champs d'affichage de score se superposent avec les champs chronomètre et mi-temps, diminution de la police de caractère si un des scores dépasse la centaine
+                if len(listSplitedPanelInfo[1]) > 2 or len(listSplitedPanelInfo[2]) > 2:
+                    self.Canvas.itemconfigure(self._fieldLocalScore, font=("Arial", 10, 'bold'))
+                    self.Canvas.itemconfigure(self._fieldVisitorScore, font=("Arial", 10, 'bold'))
                 else:
-                    self.Canvas.itemconfigure(item, text=listSplitedPanelInfo[5 + index], state='normal')
-                    self.Canvas.itemconfigure(self._pictLocalPrison[index], state='normal')
-            for index, item in enumerate(self._fieldVisitorPrison):
-                if listSplitedPanelInfo[8 + index] == ':':
-                    self.Canvas.itemconfigure(item, state='hidden')
-                    self.Canvas.itemconfigure(self._pictVisitorPrison[index], state='hidden')
-                else:
-                    self.Canvas.itemconfigure(item, text=listSplitedPanelInfo[8 + index], state='normal')
-                    self.Canvas.itemconfigure(self._pictVisitorPrison[index], state='normal')
+                    self.Canvas.itemconfigure(self._fieldLocalScore, font=("Arial", 13, 'bold'))
+                    self.Canvas.itemconfigure(self._fieldVisitorScore, font=("Arial", 13, 'bold'))
+                self.Canvas.itemconfigure(self._fieldVisitorScore, text=listSplitedPanelInfo[2])
+                self.Canvas.itemconfigure(self._fieldPeriod, text=listSplitedPanelInfo[3])
+                for index, item in enumerate(self._fieldLocalPrison):
+                    if listSplitedPanelInfo[5 + index] == ':':
+                        self.Canvas.itemconfigure(item, state='hidden')
+                        self.Canvas.itemconfigure(self._pictLocalPrison[index], state='hidden')
+                    else:
+                        self.Canvas.itemconfigure(item, text=listSplitedPanelInfo[5 + index], state='normal')
+                        self.Canvas.itemconfigure(self._pictLocalPrison[index], state='normal')
+                for index, item in enumerate(self._fieldVisitorPrison):
+                    if listSplitedPanelInfo[8 + index] == ':':
+                        self.Canvas.itemconfigure(item, state='hidden')
+                        self.Canvas.itemconfigure(self._pictVisitorPrison[index], state='hidden')
+                    else:
+                        self.Canvas.itemconfigure(item, text=listSplitedPanelInfo[8 + index], state='normal')
+                        self.Canvas.itemconfigure(self._pictVisitorPrison[index], state='normal')
         self.after( 20, self.refresh)
     
     def close(self):

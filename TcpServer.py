@@ -1,7 +1,6 @@
 # -*-coding:Utf-8 -*-
 import threading    # Importe le module dédié à l'exécution parallèle
 import socket       # Importe le module dédié au réseau
-import io
 
 class TcpServer(threading.Thread):
     """Thread chargé de gérer la liaison TCP avec le PC client"""
@@ -23,8 +22,9 @@ class TcpServer(threading.Thread):
         self.StopIsAsked = False
 
         # Création du flux de sortie
-        self.outStream = io.StringIO()
-        self.iSizeOfMsg = 0
+        self.outStream = "Equipe 1|Equipe 2|Game"
+        # Création d'un verrou sur le flux de sortie pour éviter les accès concurrents
+        self.outLocker = threading.RLock()
 
     def run(self):
         """Exécution du thread"""
@@ -46,12 +46,9 @@ class TcpServer(threading.Thread):
                 elif (len(sMsgReceived) != 0): # teste le message reçu n'est pas vide
                     # Acquitement du message
                     self._ClientConnection.send(b"\n")
-                    # Vide le flux d’écriture
-                    self.outStream.flush()
-                    # Envoie de la trame reçue par le PC client pour affichage
-                    self.iSizeOfMsg = self.outStream.write(sMsgReceived)
-                    # Positionne le curseur au début de la trame
-                    self.outStream.seek(len(self.outStream.getvalue()) - self.iSizeOfMsg)
+                    # Mise à jour de la trame reçue par le PC client pour affichage dans le gestionnaire de contexte pour éviter les accès concurrents
+                    with self.outLocker:
+                        self.outStream = sMsgReceived
             except ConnectionResetError:
                 self._ClientConnection.close()
                 # Attente d'une nouvelle connexion du PC client
