@@ -1,0 +1,6 @@
+Installation bibliothèque serial :
+https://pypi.org/project/pyserial/#modal-close
+Télécharger le fichier Wheel, puis, dans une console Cmd Windows :
+cd "répertoire du fichier Wheel"
+"Répertoire d'installation de Python"\Python\Python38-32\Scripts\pip.exe install pyserial-3.4-py2.py3-none-any.whl
+Documentation : https://pythonhosted.org/pyserial/
