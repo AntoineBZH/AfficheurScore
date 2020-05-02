@@ -19,7 +19,7 @@ class GraphicInter(tk.Tk):
         # Initialisation de la toile
         self.Screen = tk.PhotoImage(file=ScreenPath)
         self.ScreenWidth, self.ScreenHeight = self.Screen.width(), self.Screen.height()
-        self.Canvas = tk.Canvas(self, width=self.ScreenWidth, height=self.ScreenHeight, borderwidth=0, highlightthickness=0)
+        self.Canvas = tk.Canvas(self, width=self.ScreenWidth, height=self.ScreenHeight, borderwidth=0, highlightthickness=0, cursor="none")
         self.Canvas.pack()
         self.Canvas.create_image((self.ScreenWidth//2, self.ScreenHeight//2), image=self.Screen)
 
@@ -90,7 +90,7 @@ class GraphicInter(tk.Tk):
         self.TM = 'Game'
 
         # Lancement du thread de récupération des informations de l'afficheur
-        self.PanelInfo = Reader.Reader(port='COM1', frameid='30303035')
+        self.PanelInfo = Reader.Reader(port='/dev/ttyAMA0')
         self.PanelInfo.start()
 
     def refresh(self):

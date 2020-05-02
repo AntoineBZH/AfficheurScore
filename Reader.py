@@ -33,7 +33,7 @@ class Reader(threading.Thread):
             raise SerialException("Impossible d\'instancier la classe Reader.")
             
         # Création d'un flux bufferisé de texte avec comme caractère de fin de ligne 0x0D
-        self._sio = io.TextIOWrapper(io.BufferedRWPair(self._SerialPort, self._SerialPort), newline='\r')
+        self._sio = io.TextIOWrapper(io.BufferedRWPair(self._SerialPort, self._SerialPort), encoding='cp1252', newline='\r')
 
         # Création du flux de sortie
         self.outStream = "15:00|0|0|1|0|:|:|:|:|:|:"
@@ -61,7 +61,7 @@ class Reader(threading.Thread):
             raise SerialException("Impossible de fermer le port {}.".format(self._SerialPort.port))
 
 if __name__ == "__main__":
-    TestSer = Reader(port='COM1', frameid='30303035')
+    TestSer = Reader(port='/dev/ttyAMA0')
     TestSer.start()
     while True:
         print(TestSer.outStream)
